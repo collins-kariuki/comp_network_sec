@@ -1,37 +1,41 @@
 # Kuria Collins Kariuki
 # P15/130005/2018
-
-print("\n...Symetric Key decryption...\n")
-
-cipher = input("Please enter the cipher: ")
-key = input("Enter the key: ")
-
-message = []
+import uuid
+from symetric_key import encrypt, decrypt
+# Key Distribution Network KDC
 
 
-def decrypt(cipher, key):
-    key_index = 0
+class KDC:
+    ''' Key Distribution Network contains the Authentication Server, User DB and the ticket granting service '''
 
-    def decry_func(cipher_index, key_index):
+    TGS_key = "11234rtghjko0987ytf"
 
-        message.append(
-            chr(int(split_cipher[cipher_index]) // ord(key[key_index])))
+    def __init__(self, name):
+        self.name = name
+        self.TGS_key = input("Enter Ticket Gen Server key")
+        self.db_key = input("Ebter db_key")
+        self.user_key = input("Ebter user_key")
+        self.db = users = {
+            '1qase34rfgy7yujm': 'kuria'
+        }
 
-    split_cipher = cipher.split(", ")
-    print(split_cipher)
-    for cipher_index in range(len(split_cipher)):
-        if (cipher_index > 0) and (cipher_index % 8 == 0):
-            if key_index == len(key):
-                key_index = 0
-                decry_func(cipher_index, key_index)
-            else:
-                key_index = key_index + 1
-                decry_func(cipher_index, key_index)
-        else:
-            decry_func(cipher_index, key_index)
+    def auth_server(self, cipher):
+        self.user_key
+        self.db_key
 
-    return "".join(message)
+        user_recv = decrypt(cipher, self.user_key)
 
+        db_AS_cipher = encrypt(user_recv, self.db_key)
 
-decrypted_message = decrypt(cipher, key)
-print(decrypted_message)
+        user_id = decrypt(db_AS_cipher, self.db_key)
+
+        if self.db.get(user_id):
+            token = str(uuid.uuid4)
+            return encrypt(token, self.TGS_key)
+
+    def TGS(self, TGT):
+        TGT = decrypt(TGT, self.TGS_key)
+        return encrypt(TGT, self.user_key)
+
+    def file_server(self, ticket):
+        token = decrypt(ticket, self.user_key)
