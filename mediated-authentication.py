@@ -2,40 +2,55 @@
 # P15/130005/2018
 import uuid
 from symetric_key import encrypt, decrypt
+from datetime import timedelta
 # Key Distribution Network KDC
 
 
 class KDC:
-    ''' Key Distribution Network contains the Authentication Server, User DB and the ticket granting service '''
+    ''' 
+        Key Distribution Centre contains the Authentication Server, User DB and the Ticket Granting Server 
 
-    TGS_key = "11234rtghjko0987ytf"
+    '''
 
     def __init__(self, name):
         self.name = name
-        self.TGS_key = input("Enter Ticket Gen Server key")
-        self.db_key = input("Ebter db_key")
-        self.user_key = input("Ebter user_key")
-        self.db = users = {
+        self.AS_TGS_key = input("Enter Ticket Gen Server key")
+        self.TGS_file_server_key = input("Ebter db_key")
+        self.user_AS_key = input("Ebter user_key")
+        self.db = {
             '1qase34rfgy7yujm': 'kuria'
         }
 
     def auth_server(self, cipher):
-        self.user_key
-        self.db_key
 
-        user_recv = decrypt(cipher, self.user_key)
+        user_pass_hash = decrypt(cipher, self.user_AS_key)
 
-        db_AS_cipher = encrypt(user_recv, self.db_key)
-
-        user_id = decrypt(db_AS_cipher, self.db_key)
-
-        if self.db.get(user_id):
-            token = str(uuid.uuid4)
-            return encrypt(token, self.TGS_key)
+        if self.db.get(user_pass_hash):
+            return encrypt(user_pass_hash, self.AS_TGS_key)
+        else:
+            return "Auth failed"
 
     def TGS(self, TGT):
-        TGT = decrypt(TGT, self.TGS_key)
-        return encrypt(TGT, self.user_key)
+        user_pass_hash = decrypt(TGT, self.AS_TGS_key)
+        if self.db.get(user_pass_hash):
+            token = str(uuid.uuid4) + str(timedelta(hours=4))
+            return encrypt(token, self.TGS_file_server_key)
+        else:
+            return "Auth failed 2"
 
     def file_server(self, ticket):
-        token = decrypt(ticket, self.user_key)
+        token = decrypt(ticket, self.TGS_file_server_key)
+        return print(token)
+
+
+key_centre = KDC("kdc1")
+
+pass_hash = "1qase34rfgy7yujm"
+
+pass_cipher = encrypt(pass_hash, key_centre.user_AS_key)
+
+TGT = key_centre.auth_server(pass_cipher)
+
+ticket = key_centre.TGS(TGT)
+
+token = key_centre.file_server(ticket)
